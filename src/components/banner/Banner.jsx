@@ -7,6 +7,8 @@ const apiKey = process.env.REACT_APP_TMDB_API_KEY;
 
 const Banner = () => {
   const [movie, setMovie] = useState();
+  const [showModal, setShowModal] = useState(false);
+  const [trailerKey, setTrailerKey] = useState("");
 
   useEffect(() => {
     async function fetchTrending() {
@@ -15,7 +17,7 @@ const Banner = () => {
           `${baseUrl}/trending/all/week?api_key=${apiKey}&language=en-US`
         );
         const results = response.data.results;
-        console.log(results)
+        console.log(results);
         setMovie(results[Math.floor(Math.random() * results.length)]);
       } catch (error) {
         console.error("Failed to fetch banner movie:", error);
@@ -23,6 +25,23 @@ const Banner = () => {
     }
     fetchTrending();
   }, []);
+
+  const handleMoreInfo = async () => {
+    try {
+      const res = await axios.get(
+        `${baseUrl}/${movie.media_type || "movie"}/${
+          movie.id
+        }/videos?api_key=${apiKey}`
+      );
+      const trailer = res.data.results.find(
+        (v) => v.type === "Trailer" && v.site === "YouTube"
+      );
+      setTrailerKey(trailer ? trailer.key : "");
+    } catch (err) {
+      console.error("Error fetching trailer:", err);
+    }
+    setShowModal(true);
+  };
 
   return (
     <div className="relative h-[70vh] object-cover">
@@ -48,12 +67,50 @@ const Banner = () => {
                 <button className="outline-none border-none rounded-[5px] bg-[rgba(51,51,51,0.5)] px-6 py-2 text-white hover:bg-[#e6e6e6] hover:text-black">
                   Play
                 </button>
-                <button className="outline-none border-none rounded-[5px] bg-[rgba(51,51,51,0.5)] px-6 py-2 text-white hover:bg-[#e6e6e6] hover:text-black">
+                <button
+                  onClick={handleMoreInfo}
+                  className="outline-none border-none rounded-[5px] bg-[rgba(51,51,51,0.5)] px-6 py-2 text-white hover:bg-[#e6e6e6] hover:text-black"
+                >
                   More Info
                 </button>
               </div>
             </div>
           </div>
+
+          {showModal && (
+            <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50">
+              <div className="bg-[#111] text-white p-6 rounded max-w-2xl w-full relative">
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="absolute top-2 right-4 text-white text-xl"
+                >
+                  x
+                </button>
+                <h2 className="text-3xl font-bold mb-2">
+                  {movie.title || movie.name}
+                </h2>
+                <p className="text-sm mb-4">{movie.overview}</p>
+                <p className="text-sm mb-2">
+                  <strong>Release Date:</strong> {movie.release_date || "N/A"}
+                </p>
+                <p className="text-sm mb-4">
+                  <strong>Rating:</strong> {movie.vote_average}
+                </p>
+                {trailerKey ? (
+                  <iframe
+                    width="100%"
+                    height="315"
+                    src={`https://www.youtube.com/embed/${trailerKey}`}
+                    title="YouTube video player"
+                    frameBorder="0"
+                    allowFullScreen
+                  ></iframe>
+                ) : (
+                  <p className="text-gray-400">Trailer not available</p>
+                )}
+              </div>
+            </div>
+          )}
         </>
       )}
     </div>
