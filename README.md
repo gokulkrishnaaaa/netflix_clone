@@ -3,8 +3,8 @@ A Netflix UI Clone built using React.js, Axios, TMDB API, and Tailwind CSS. This
 
 🚀 Features
 
- Fetches real-time data from TMDB (The Movie Database) API
- Dynamic rows with scrollable movie posters (Action, Comedy, Horror, etc.)
- Random featured movie in the banner section
- "More Info" modal for movie overview, release date, and rating
- Styled using Tailwind CSS
+ Fetches real-time data from TMDB (The Movie Database) API <br>
+ Dynamic rows with scrollable movie posters (Action, Comedy, Horror, etc.) <br>
+ Random featured movie in the banner section <br>
+ "More Info" modal for movie overview, release date, and rating <br>
+ Styled using Tailwind CSS <br>
